@@ -15,7 +15,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import platform
 from fastapi.staticfiles import StaticFiles
-
+import tempfile
+import shuti
 
 # ───────────── CONFIG ───────────── #
 if platform.system() == "Windows":
@@ -47,11 +48,24 @@ def log(msg: str):
 
 # ───────────── UTILS ───────────── #
 def download_video(url, filename="video.mp4"):
+    # Path where Render mounts your cookie file
+    secret_cookie_path = "/etc/secrets/www.youtube.com_cookies.txt"
+
+    # Copy to a temporary file (writable)
+    tmp_cookie_path = os.path.join(tempfile.gettempdir(), "cookies.txt")
+    if os.path.exists(secret_cookie_path):
+        shutil.copy(secret_cookie_path, tmp_cookie_path)
+    else:
+        tmp_cookie_path = None  # fallback if running locally without secret
+
     ydl_opts = {
         "outtmpl": filename,
-        "cookiefile": "/etc/secrets/www.youtube.com_cookies.txt",  # use cookie file
-        "format": "bestvideo+bestaudio/best",  # ensure full video
+        "format": "bestvideo+bestaudio/best",
     }
+
+    if tmp_cookie_path:
+        ydl_opts["cookiefile"] = tmp_cookie_path
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
     return filename
