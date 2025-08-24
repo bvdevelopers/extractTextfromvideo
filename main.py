@@ -58,9 +58,10 @@ def download_video(url, filename="video.mp4"):
         tmp_cookie_path = None  # fallback if no secret (local run)
 
     ydl_opts = {
-        "outtmpl": filename,
-        "format": "bestvideo[ext=mp4]+bestaudio/best",
-        "merge_output_format": "mp4"
+    "outtmpl": filename,
+    # Force mp4 (H.264 + AAC), avoid AV1
+    "format": "bestvideo[ext=mp4][vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4][vcodec^=avc1]",
+    "merge_output_format": "mp4",
     }
 
     if tmp_cookie_path:
