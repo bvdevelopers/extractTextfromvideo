@@ -14,6 +14,7 @@ from fastapi import Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import platform
+from fastapi.staticfiles import StaticFiles
 
 
 # ───────────── CONFIG ───────────── #
