@@ -49,7 +49,8 @@ def log(msg: str):
 def download_video(url, filename="video.mp4"):
     ydl_opts = {
         "outtmpl": filename,
-        "cookies": "/etc/secrets/www.youtube.com_cookies.txt",  # 👈 use cookies
+        "cookiefile": "/etc/secrets/www.youtube.com_cookies.txt",  # use cookie file
+        "format": "bestvideo+bestaudio/best",  # ensure full video
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
