@@ -5,5 +5,5 @@ python-docx
 pytesseract
 opencv-python-headless
 numpy
-yt-dlp[websockets]==2025.1.15
+yt-dlp
 python-multipart
