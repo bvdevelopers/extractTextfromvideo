@@ -5,4 +5,5 @@ python-docx
 pytesseract
 opencv-python-headless
 numpy
-pytube
+yt-dlp
+python-multipart
