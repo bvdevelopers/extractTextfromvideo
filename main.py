@@ -59,7 +59,7 @@ def download_video(url, filename="video.mp4"):
 
     ydl_opts = {
         "outtmpl": filename,
-        "format": "bestvideo+bestaudio/best",
+        "format": "bestvideo[ext=mp4]",
     }
 
     if tmp_cookie_path:

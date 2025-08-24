@@ -146,7 +146,7 @@
       resetBtn.disabled = false;
       downloadBtn.disabled = true;
 
-      await fetch("/process", {
+      await fetch("http://localhost:8080/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url })
@@ -158,7 +158,7 @@
 
     function pollStatus() {
       interval = setInterval(async () => {
-        const res = await fetch("/logs");
+        const res = await fetch("http://localhost:8080/logs");
         const data = await res.json();
 
         statusText.textContent = data.status.completed ? "Completed" : (data.status.running ? "Running..." : "Idle");
@@ -178,13 +178,13 @@
     }
 
     downloadBtn.addEventListener("click", () => {
-      window.location.href = "/download";
+      window.location.href = "http://localhost:8080/download";
     });
 
     resetBtn.addEventListener("click", async () => {
       if (interval) clearInterval(interval);
 
-      await fetch("/reset", { method: "POST" });
+      await fetch("http://localhost:8080/reset", { method: "POST" });
 
       startBtn.disabled = false;
       resetBtn.disabled = true;
