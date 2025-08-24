@@ -1,7 +1,8 @@
 fastapi
-uvicorn[standard]
-pytube
-pytesseract
-moviepy
-opencv-python-headless
+uvicorn
 jinja2
+python-docx
+pytesseract
+opencv-python-headless
+numpy
+yt-dlp
