@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Text Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f9fc;
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    .progress-container {
+      margin-top: 20px;
+      background: #eee;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 20px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #28a745;
+      transition: width 0.5s;
+    }
+    .log-box {
+      margin-top: 20px;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 10px;
+      border-radius: 6px;
+      height: 200px;
+      overflow-y: auto;
+    }
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>📹 Video Text Extractor</h1>
+  <div class="card">
+    <form id="processForm">
+      <label for="url">YouTube Link:</label>
+      <input type="text" id="url" required>
+
+      <button type="submit" id="startBtn">Start Processing</button>
+      <button type="button" id="resetBtn" disabled>Reset</button>
+      <button type="button" id="downloadBtn" disabled>Download File</button>
+    </form>
+
+    <div class="status">Status: <span id="statusText">Idle</span></div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="log-box" id="logBox">Logs will appear here...</div>
+  </div>
+  <footer style="
+    background: #111;
+    color: #fff;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid gold;
+    font-family: Arial, sans-serif;
+">
+    <!-- Left side (Vel icon) -->
+    <img src="vel.svg" alt="Vel" height="50px" width="50px" />
+
+    <!-- Right side (Details) -->
+    <div style="text-align: right;">
+        <p style="margin: 0; font-size: 18px; font-weight: bold;">Velan</p>
+        <p style="margin: 0; font-size: 14px;">@bvdevelopers 2025</p>
+        <p style="margin: 0; font-size: 14px;">
+            <a href="mailto:bvdevelopers9645@gmail.com" style="color: gold; text-decoration: none;">
+                bvdevelopers9645@gmail.com
+            </a>
+        </p>
+    </div>
+</footer>
+
+  <script>
+    const form = document.getElementById("processForm");
+    const statusText = document.getElementById("statusText");
+    const logBox = document.getElementById("logBox");
+    const progressBar = document.getElementById("progressBar");
+    const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    let interval = null;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const url = document.getElementById("url").value;
+
+      statusText.textContent = "Starting...";
+      logBox.textContent = "Logs will appear here...";
+      progressBar.style.width = "0%";
+
+      startBtn.disabled = true;
+      resetBtn.disabled = false;
+      downloadBtn.disabled = true;
+
+      await fetch("http://localhost:8080/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+
+      statusText.textContent = "Running...";
+      pollStatus();
+    });
+
+    function pollStatus() {
+      interval = setInterval(async () => {
+        const res = await fetch("http://localhost:8080/logs");
+        const data = await res.json();
+
+        statusText.textContent = data.status.completed ? "Completed" : (data.status.running ? "Running..." : "Idle");
+        logBox.textContent = data.logs.join("\n");
+        logBox.scrollTop = logBox.scrollHeight;
+
+        let progress = Math.min(100, data.logs.length * 10);
+        progressBar.style.width = progress + "%";
+
+        if (data.status.completed) {
+          clearInterval(interval);
+          statusText.textContent = "✅ Completed!";
+          progressBar.style.width = "100%";
+          downloadBtn.disabled = false; // enable download
+        }
+      }, 2000);
+    }
+
+    downloadBtn.addEventListener("click", () => {
+      window.location.href = "http://localhost:8080/download";
+    });
+
+    resetBtn.addEventListener("click", async () => {
+      if (interval) clearInterval(interval);
+
+      await fetch("http://localhost:8080/reset", { method: "POST" });
+
+      startBtn.disabled = false;
+      resetBtn.disabled = true;
+      downloadBtn.disabled = true;
+
+      statusText.textContent = "Idle";
+      progressBar.style.width = "0%";
+      logBox.textContent = "Logs will appear here...";
+      document.getElementById("url").value = "";
+    });
+  </script>
+</body>
+</html>
