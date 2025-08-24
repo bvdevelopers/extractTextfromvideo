@@ -50,6 +50,7 @@ def download_video(url, filename="video.mp4"):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
     return filename
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def extract_text_from_video(video_path, doc_path="save.docx", change_threshold=30):
     cap = cv2.VideoCapture(video_path)

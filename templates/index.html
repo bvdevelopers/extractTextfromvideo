@@ -109,7 +109,7 @@
     font-family: Arial, sans-serif;
 ">
     <!-- Left side (Vel icon) -->
-    <img src="vel.svg" alt="Vel" height="50px" width="50px" />
+    <img src="/static/vel.svg" alt="Vel" height="50px" width="50px" />
 
     <!-- Right side (Details) -->
     <div style="text-align: right;">
@@ -146,7 +146,7 @@
       resetBtn.disabled = false;
       downloadBtn.disabled = true;
 
-      await fetch("http://localhost:8080/process", {
+      await fetch("/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url })
@@ -158,7 +158,7 @@
 
     function pollStatus() {
       interval = setInterval(async () => {
-        const res = await fetch("http://localhost:8080/logs");
+        const res = await fetch("/logs");
         const data = await res.json();
 
         statusText.textContent = data.status.completed ? "Completed" : (data.status.running ? "Running..." : "Idle");
@@ -178,13 +178,13 @@
     }
 
     downloadBtn.addEventListener("click", () => {
-      window.location.href = "http://localhost:8080/download";
+      window.location.href = "/download";
     });
 
     resetBtn.addEventListener("click", async () => {
       if (interval) clearInterval(interval);
 
-      await fetch("http://localhost:8080/reset", { method: "POST" });
+      await fetch("/reset", { method: "POST" });
 
       startBtn.disabled = false;
       resetBtn.disabled = true;
