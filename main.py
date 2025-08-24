@@ -16,7 +16,6 @@ from fastapi.templating import Jinja2Templates
 import platform
 from fastapi.staticfiles import StaticFiles
 import tempfile
-import shuti
 
 # ───────────── CONFIG ───────────── #
 if platform.system() == "Windows":
