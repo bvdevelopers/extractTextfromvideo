@@ -7,3 +7,5 @@ opencv-python-headless
 numpy
 yt-dlp[websockets]==2025.1.15
 python-multipart
+shuti
+tempfile
