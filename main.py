@@ -47,24 +47,24 @@ def log(msg: str):
 
 # ───────────── UTILS ───────────── #
 def download_video(url, filename="video.mp4"):
-    # Path where Render mounts your cookie file
-    secret_cookie_path = "/etc/secrets/www.youtube.com_cookies.txt"
+    # Path where Render mounts your secret file
+    secret_cookie_path = "/etc/secrets/cookies.txt"
 
-    # Copy to a temporary file (writable)
+    # Copy to temp (because /etc/secrets is read-only)
     tmp_cookie_path = os.path.join(tempfile.gettempdir(), "cookies.txt")
     if os.path.exists(secret_cookie_path):
         shutil.copy(secret_cookie_path, tmp_cookie_path)
     else:
-        tmp_cookie_path = None  # fallback if running locally without secret
+        tmp_cookie_path = None  # fallback if no secret (local run)
 
     ydl_opts = {
         "outtmpl": filename,
-        "format": "bestvideo[ext=mp4]",
-        "extractor_args": {"youtube": {"player_client": ["tv"]}}
+        "format": "bestvideo[ext=mp4]+bestaudio/best",
+        "merge_output_format": "mp4"
     }
 
     if tmp_cookie_path:
-        ydl_opts["cookiefile"] = tmp_cookie_path
+        ydl_opts["cookiefile"] = tmp_cookie_path   # ✅ point to valid cookie
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
